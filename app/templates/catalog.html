@@ -12,7 +12,7 @@
     <div class="card bg-white border-0 shadow-sm p-4 mb-4">
         <div class="row g-3">
             <div class="col-md-8">
-                <input type="text" id="catalogSearch" class="form-control form-control-lg border-2 shadow-none" placeholder="Search by title, author, or catalog ID...">
+                <input type="text" id="catalogSearch" class="form-control form-control-lg border-2 shadow-none" placeholder="Search by title, author, category, or catalog ID...">
             </div>
             <div class="col-md-4">
                 <select id="statusFilter" class="form-select form-select-lg border-2 shadow-none">
@@ -35,6 +35,9 @@
                         <th>Category</th>
                         <th>Current Status</th>
                         <th>Borrowed By</th>
+                        <th>Level & Section</th>
+                        <th>Date Borrowed</th>
+                        <th>Due Date</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -52,6 +55,7 @@
                             <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2">Borrowed</span>
                             {% endif %}
                         </td>
+                        
                         <td class="fw-medium text-dark">
                             {% if book.status.lower().strip() == 'borrowed' and book.borrowed_by %}
                                 👤 {{ book.borrowed_by }}
@@ -59,10 +63,32 @@
                                 <span class="text-muted text-opacity-50">—</span>
                             {% endif %}
                         </td>
+
+                        <td class="text-dark small fw-medium">
+                            {% if book.status.lower().strip() == 'borrowed' and book.level_section %}
+                                {{ book.level_section }}
+                            {% else %}
+                                <span class="text-muted text-opacity-30">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted small font-monospace">
+                            {% if book.status.lower().strip() == 'borrowed' and book.date_borrowed %}
+                                {{ book.date_borrowed }}
+                            {% else %}
+                                <span class="text-muted text-opacity-30">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="small font-monospace">
+                            {% if book.status.lower().strip() == 'borrowed' and book.due_date %}
+                                <span class="text-danger fw-semibold">{{ book.due_date }}</span>
+                            {% else %}
+                                <span class="text-muted text-opacity-30">—</span>
+                            {% endif %}
+                        </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="6" class="text-center text-muted py-4">No volumes registered in collection database sheets.</td>
+                        <td colspan="9" class="text-center text-muted py-4">No volumes registered in collection database sheets.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -82,14 +108,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const selectedStatus = statusFilter.value.toLowerCase().trim();
 
         tableRows.forEach(row => {
-            // Extracts current table row items cleanly for parsing match logic
             const titleText = row.querySelector('.search-title') ? row.querySelector('.search-title').textContent.toLowerCase() : '';
             const authorText = row.querySelector('.search-author') ? row.querySelector('.search-author').textContent.toLowerCase() : '';
             const idText = row.querySelector('.search-id') ? row.querySelector('.search-id').textContent.toLowerCase() : '';
             const categoryText = row.querySelector('.search-category') ? row.querySelector('.search-category').textContent.toLowerCase() : '';
             const rowStatusValue = row.querySelector('.search-status') ? row.querySelector('.search-status').getAttribute('data-status').toLowerCase().trim() : '';
 
-            // Run evaluation assertions
             const matchesSearch = titleText.includes(searchQuery) || 
                                   authorText.includes(searchQuery) || 
                                   idText.includes(searchQuery) ||
@@ -97,7 +121,6 @@ document.addEventListener('DOMContentLoaded', function () {
                                   
             const matchesStatus = selectedStatus === "" || rowStatusValue === selectedStatus;
 
-            // Display manipulation execution loop based on matching constraints
             if (matchesSearch && matchesStatus) {
                 row.style.setProperty('display', '', 'important');
             } else {
@@ -106,7 +129,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Attach dynamic operational listeners
     searchInput.addEventListener('input', filterCatalogTable);
     statusFilter.addEventListener('change', filterCatalogTable);
 });
