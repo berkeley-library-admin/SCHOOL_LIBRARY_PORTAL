@@ -39,7 +39,12 @@ def get_live_books_data():
                 'author': row[2],
                 'category': row[3],
                 'status': row[4],
-                'borrowed_by': row[5] # Added this tracking index
+                'borrowed_by': row[5], # Make sure there is a comma at the end of this line!
+                
+                # PASTE THESE 3 NEW TRACKING PARAMETERS HERE:
+                'level_section': row[6] if len(row) > 6 else '',
+                'date_borrowed': row[7] if len(row) > 7 else '',
+                'due_date': row[8] if len(row) > 8 else ''
             }
             books_list.append(book_dict)
             
