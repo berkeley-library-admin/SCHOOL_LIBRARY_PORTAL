@@ -1,0 +1,27 @@
+/* Custom Typography Override */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8f9fa; /* Soft off-white to combat eye-strain */
+    color: #212529;
+}
+
+/* Polished Nav Styling */
+.navbar {
+    background-color: #1e293b !important; /* Deep dark slate slate tone */
+}
+
+.navbar-brand {
+    letter-spacing: 0.05em;
+}
+
+/* Card Enhancements for Dashboard Stats */
+.card {
+    border: none;
+    border-radius: 10px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important;
+}

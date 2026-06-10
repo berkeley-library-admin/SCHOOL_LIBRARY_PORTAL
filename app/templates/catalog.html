@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="fw-bold text-dark tracking-tight">Book Catalog</h1>
+            <p class="text-muted">Browse full collection archives with instant searching and status filter controls.</p>
+        </div>
+    </div>
+
+    <div class="card bg-white border-0 shadow-sm p-4 mb-4">
+        <div class="row g-3">
+            <div class="col-md-8">
+                <input type="text" id="catalogSearch" class="form-control form-control-lg border-2 shadow-none" placeholder="Search by title, author, or catalog ID...">
+            </div>
+            <div class="col-md-4">
+                <select id="statusFilter" class="form-select form-select-lg border-2 shadow-none">
+                    <option value="">All Availability States</option>
+                    <option value="available">Available</option>
+                    <option value="borrowed">Borrowed</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-white border-0 shadow-sm p-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="catalogTable">
+                <thead class="table-light text-muted small fw-bold text-uppercase">
+                    <tr>
+                        <th>Lexile Level</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Category</th>
+                        <th>Current Status</th>
+                        <th>Borrowed By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in books %}
+                    <tr class="book-row">
+                        <td class="font-monospace fw-bold text-secondary search-id">{{ book.id }}</td>
+                        <td class="fw-semibold text-dark search-title">{{ book.title }}</td>
+                        <td class="text-muted search-author">{{ book.author }}</td>
+                        <td><span class="badge bg-light text-dark border">{{ book.category }}</span></td>
+                        <td class="search-status" data-status="{{ book.status.lower().strip() }}">
+                            {% if book.status.lower().strip() == 'available' %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">Available</span>
+                            {% else %}
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2">Borrowed</span>
+                            {% endif %}
+                        </td>
+                        <td class="search-borrower fw-medium text-dark">
+                            {% if book.status.lower().strip() == 'borrowed' and book.borrowed_by %}
+                                👤 {{ book.borrowed_by }}
+                            {% else %}
+                                <span class="text-muted text-opacity-50">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">No volumes registered in collection database sheets.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

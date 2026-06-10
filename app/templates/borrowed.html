@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="fw-bold text-dark tracking-tight">Active Library Loans</h1>
+            <p class="text-muted">Dedicated monitoring registry for volumes currently checked out by clients.</p>
+        </div>
+    </div>
+
+    <div class="alert alert-warning border-0 shadow-sm d-flex align-items-center p-3 mb-4" role="alert">
+        <div class="fs-4 me-3">📋</div>
+        <div>
+            <strong>Circulation Alert:</strong> There are currently <span class="badge bg-dark">{{ loans|length }}</span> volumes outstanding requiring return tracking.
+        </div>
+    </div>
+
+    <div class="card bg-white border-0 shadow-sm p-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-muted small fw-bold text-uppercase">
+                    <tr>
+                        <th>Asset ID</th>
+                        <th>Book Title</th>
+                        <th>Borrower / Client Name</th>
+                        <th>Classification</th>
+                        <th>Action Check</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for loan in loans %}
+                    <tr>
+                        <td class="font-monospace fw-bold text-secondary">{{ loan.id }}</td>
+                        <td class="fw-semibold text-dark">{{ loan.title }}</td>
+                        <td class="fw-bold text-primary">👤 {{ loan.borrowed_by if loan.borrowed_by else 'Unknown Student' }}</td>
+                        <td><span class="badge bg-light text-dark border">{{ loan.category }}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="alert('System connected to live Google Sheet data pipeline. To check this book back in, clear or modify its row inside your Google Spreadsheet database matrix!')">
+                                Manage Loan
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-5">
+                            <div class="fs-2 mb-2">🎉</div>
+                            All assets accounted for! Zero active loans currently registered.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
