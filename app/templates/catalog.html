@@ -69,4 +69,39 @@
         </div>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('catalogSearch');
+    const statusFilter = document.getElementById('statusFilter');
+    const tableRows = document.querySelectorAll('#catalogTable tbody .book-row');
+
+    function filterCatalogTable() {
+        const searchQuery = searchInput.value.toLowerCase().trim();
+        const selectedStatus = statusFilter.value.toLowerCase().trim();
+
+        tableRows.forEach(row => {
+            const titleText = row.querySelector('.search-title').textContent.toLowerCase();
+            const authorText = row.querySelector('.search-author').textContent.toLowerCase();
+            const idText = row.querySelector('.search-id').textContent.toLowerCase();
+            const rowStatus = row.querySelector('.search-status').getAttribute('data-status') || '';
+
+            const matchesSearch = titleText.includes(searchQuery) || 
+                                  authorText.includes(searchQuery) || 
+                                  idText.includes(searchQuery);
+                                  
+            const matchesStatus = selectedStatus === "" || rowStatus === selectedStatus;
+
+            if (matchesSearch && matchesStatus) {
+                row.style.display = ''; 
+            } else {
+                row.style.display = 'none'; 
+            }
+        });
+    }
+
+    searchInput.addEventListener('input', filterCatalogTable);
+    statusFilter.addEventListener('change', filterCatalogTable);
+});
+</script>
+
 {% endblock %}
