@@ -9,22 +9,17 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+        .bg-dark-premium { background-color: #11141a !important; }
         .line-height-1 { line-height: 1.1; }
-        .tracking-widest { letter-spacing: 2.5px; }
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm py-2">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark-premium border-bottom border-secondary shadow-sm py-2">
         <div class="container">
-            <a class="navbar-brand fw-bold text-uppercase d-flex align-items-center text-dark" href="/" style="letter-spacing: 1px;">
-                <div class="bg-warning text-dark rounded-3 d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 36px; height: 36px;">
-                    <i class="bi bi-shield-shaded fs-5"></i>
-                </div>
-                <div class="d-flex flex-column line-height-1">
-                    <span class="fs-5 fw-extrabold text-dark" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">BERKELEY SCHOOL, INC.</span>
-                    <span class="text-secondary fw-semibold text-uppercase tracking-widest" style="font-size: 0.65rem;">Library Portal</span>
-                </div>
+            <a class="navbar-brand fw-bold text-uppercase d-flex flex-column line-height-1" href="/" style="letter-spacing: 1px;">
+                <span class="fs-5 fw-extrabold text-white" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">BERKELEY SCHOOL</span>
+                <span class="text-warning fw-semibold text-uppercase" style="font-size: 0.65rem; letter-spacing: 2.5px; margin-top: 2px;">Library Portal</span>
             </a>
 
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
@@ -33,8 +28,8 @@
 
             <div class="collapse navbar-collapse" id="mainNavbar">
                 <div class="navbar-nav ms-auto align-items-center mt-2 mt-lg-0">
-                    <a href="/" class="nav-link px-3 fw-medium text-secondary">Dashboard</a>
-                    <a href="/catalog" class="nav-link px-3 fw-medium text-secondary mx-1">Book Catalog</a>
+                    <a href="/" class="nav-link px-3 fw-medium text-white-50">Dashboard</a>
+                    <a href="/catalog" class="nav-link px-3 fw-medium text-white-50 mx-1">Book Catalog</a>
                     <a href="/borrowed" class="btn btn-warning btn-sm fw-bold px-3 shadow-sm rounded-pill d-flex align-items-center ms-2 text-dark">
                         <i class="bi bi-exclamation-triangle-fill me-2"></i> Active Loans
                     </a>
@@ -50,7 +45,7 @@
 
     <footer class="footer mt-auto py-3 bg-white border-top text-center">
         <div class="container">
-            <span class="text-muted small">&copy; 2026 School Library. Powered by Live Google Sheets API.</span>
+            <span class="text-muted small">&copy; 2026 School Library. Powered by Live Hybrid Sync Engine.</span>
         </div>
     </footer>
 
