@@ -33,19 +33,16 @@
                     <tr>
                         <td class="font-monospace fw-bold text-secondary">{{ loan.id }}</td>
                         <td class="fw-semibold text-dark">{{ loan.title }}</td>
-                        <td class="fw-bold text-primary">👤 {{ loan.borrowed_by if loan.borrowed_by else 'Unknown Student' }}</td>
+                        <td class="fw-bold text-primary">
+                            <i class="bi bi-person-fill"></i> {{ loan.borrowed_by if loan.borrowed_by else 'Unknown Student' }}
+                        </td>
                         <td><span class="badge bg-light text-dark border">{{ loan.category }}</span></td>
                         <td>
-                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="alert('System connected to live Google Sheet data pipeline. To check this book back in, clear or modify its row inside your Google Spreadsheet database matrix!')">
-                                Manage Loan
-                            </button>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="5" class="text-center text-muted py-5">
-                            <div class="fs-2 mb-2">🎉</div>
-                            All assets accounted for! Zero active loans currently registered.
+                            <a href="https://docs.google.com/spreadsheets/d/1O0w6xS-rI6f6p6U6B7t_fR7v1tI3y7x_JgBmUE0cgZ1MnB/edit" 
+                               target="_blank" 
+                               class="btn btn-outline-primary btn-sm fw-semibold rounded-pill px-3 d-inline-flex align-items-center shadow-sm">
+                                <i class="bi bi-box-arrow-up-right me-2"></i> Update in Sheet
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}
