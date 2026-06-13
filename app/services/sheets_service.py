@@ -3,7 +3,7 @@ import csv
 import io
 
 # Direct Live Cloud Spreadsheet Access URL
-SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSnt8fXWYKBgRag9tf2NbKc6OLmkGac4JqAjyjWLcCrT250UEb1s3y7x_JgBmUE0cgZ1MnB_7CAyG/pub?gid=0&single=true&output=csv'
+SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSnt8fXWYKBqRAg9tf2NbKc6OLmkGaC4JqAjyjJWLcCrTZ5OUeB1s3y7x_JgBmuE0cqZlMnBkL7CAyG/pub?gid=0&single=true&output=csv'
 
 def process_and_sanitize_row(row):
     """Cleans up rows altered by Google Sheets dropdown formatting and returns exactly 9 fields."""
