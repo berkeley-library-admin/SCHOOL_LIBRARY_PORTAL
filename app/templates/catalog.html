@@ -1,22 +1,33 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container">
-    <div class="row mb-4">
-        <div class="col-12">
-            <h1 class="fw-bold text-dark tracking-tight">Book Catalog</h1>
-            <p class="text-muted">Browse full collection archives with instant searching and status filter controls.</p>
+{# Safe fallback alias assignment to handle backend listing variables #}
+{% set active_books = books if books is defined else (books_list if books_list is defined else []) %}
+
+<div class="container-fluid px-4">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-8">
+            <h1 class="fw-bold text-dark tracking-tight mb-1">{{ collection_title if collection_title else 'Library Catalog' }}</h1>
+            <p class="text-muted mb-0">Browse real-time availability metrics streamed directly from the live cloud database registry.</p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <span class="badge bg-dark text-white px-3 py-2 rounded-pill fs-6 shadow-sm">
+                Total Stock: <span id="displayed-count">{{ active_books|length }}</span> / {{ active_books|length }} Items
+            </span>
         </div>
     </div>
 
-    <div class="card bg-white border-0 shadow-sm p-4 mb-4">
+    <div class="card bg-white border-0 shadow-sm p-3 mb-4">
         <div class="row g-3">
             <div class="col-md-8">
-                <input type="text" id="catalogSearch" class="form-control form-control-lg border-2 shadow-none" placeholder="Search by title, author, category, or catalog ID...">
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" id="catalog-search-input" class="form-control bg-light border-start-0 ps-0" placeholder="Search by title, author, category, or catalog ID...">
+                </div>
             </div>
             <div class="col-md-4">
-                <select id="statusFilter" class="form-select form-select-lg border-2 shadow-none">
-                    <option value="">All Availability States</option>
+                <select id="status-filter-select" class="form-select bg-light">
+                    <option value="all">All Availability States</option>
                     <option value="available">Available</option>
                     <option value="borrowed">Borrowed</option>
                 </select>
@@ -24,73 +35,77 @@
         </div>
     </div>
 
-    <div class="card bg-white border-0 shadow-sm p-4">
+    <div class="card bg-white border-0 shadow-sm p-3">
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0" id="catalogTable">
-                <thead class="table-light text-muted small fw-bold text-uppercase">
+            <table class="table table-hover align-middle mb-0" style="min-width: 1200px;" id="library-data-table">
+                <thead class="table-light text-muted small fw-bold text-uppercase border-bottom">
                     <tr>
-                        <th>Lexile Level</th>
-                        <th>Title</th>
-                        <th>Author</th>
-                        <th>Category</th>
-                        <th>Current Status</th>
-                        <th>Borrowed By</th>
-                        <th>Level & Section</th>
-                        <th>Date Borrowed</th>
-                        <th>Due Date</th>
+                        {% if collection_title == "Reference Collection" %}
+                            <th style="width: 12%;" class="searchable-col">Call Number</th>
+                        {% else %}
+                            <th style="width: 12%;" class="searchable-col">Lexile Level</th>
+                        {% endif %}
+                        
+                        <th style="width: 20%;" class="searchable-col">Book Title</th>
+                        <th style="width: 15%;" class="searchable-col">Author</th>
+                        <th style="width: 12%;" class="searchable-col">Classification</th>
+                        <th style="width: 8%;" class="text-center">Status</th>
+                        
+                        <th style="width: 12%;">Borrowed By</th>
+                        <th style="width: 11%;">Level & Section</th>
+                        <th style="width: 10%;">Date Borrowed</th>
+                        <th style="width: 10%;">Due Date</th>
                     </tr>
                 </thead>
-                <tbody>
-                    {% for book in books %}
-                    <tr class="book-row">
-                        <td class="font-monospace fw-bold text-secondary search-id">{{ book.id }}</td>
-                        <td class="fw-semibold text-dark search-title">{{ book.title }}</td>
-                        <td class="text-muted search-author">{{ book.author }}</td>
-                        <td class="search-category"><span class="badge bg-light text-dark border">{{ book.category }}</span></td>
+                <tbody id="catalog-table-body">
+                    {% for book in active_books %}
+                    <tr class="book-row {% if book.status.lower() != 'available' %}table-light-opacity{% endif %}" data-status="{{ book.status.lower().strip() }}">
+                        <td class="font-monospace fw-bold text-secondary target-text">{{ book.id }}</td>
                         
-                        <td class="search-status" data-status="{{ book.status.lower().strip() }}">
-                            {% if book.status.lower().strip() == 'available' %}
-                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">Available</span>
+                        <td class="fw-semibold text-dark text-wrap target-text">{{ book.title }}</td>
+                        <td class="text-muted text-wrap target-text">{{ book.author }}</td>
+                        <td><span class="badge bg-light text-dark border px-2 py-1 target-text">{{ book.category }}</span></td>
+                        
+                        <td class="text-center status-cell">
+                            {% if book.status.lower() == 'available' %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">
+                                Available
+                            </span>
                             {% else %}
-                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2">Borrowed</span>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1 fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px; color: #b91c1c !important; background-color: #fef2f2 !important; border-color: #fee2e2 !important;">
+                                Borrowed
+                            </span>
                             {% endif %}
                         </td>
                         
-                        <td class="fw-medium text-dark">
-                            {% if book.status.lower().strip() == 'borrowed' and book.borrowed_by %}
-                                👤 {{ book.borrowed_by }}
+                        <td class="fw-medium text-dark">{{ book.borrowed_by if book.borrowed_by else '-' }}</td>
+                        <td class="text-secondary font-monospace">{{ book.level_section if book.level_section else '-' }}</td>
+                        <td class="text-muted small">{{ book.date_borrowed if book.date_borrowed else '-' }}</td>
+                        <td class="text-muted small">
+                            {% if book.due_date %}
+                                <span class="{% if book.status.lower() != 'available' %}fw-semibold text-dark{% endif %}">{{ book.due_date }}</span>
                             {% else %}
-                                <span class="text-muted text-opacity-50">—</span>
-                            {% endif %}
-                        </td>
-
-                        <td class="text-dark small fw-medium">
-                            {% if book.status.lower().strip() == 'borrowed' and book.level_section %}
-                                {{ book.level_section }}
-                            {% else %}
-                                <span class="text-muted text-opacity-30">—</span>
-                            {% endif %}
-                        </td>
-                        <td class="text-muted small font-monospace">
-                            {% if book.status.lower().strip() == 'borrowed' and book.date_borrowed %}
-                                {{ book.date_borrowed }}
-                            {% else %}
-                                <span class="text-muted text-opacity-30">—</span>
-                            {% endif %}
-                        </td>
-                        <td class="small font-monospace">
-                            {% if book.status.lower().strip() == 'borrowed' and book.due_date %}
-                                <span class="text-danger fw-semibold">{{ book.due_date }}</span>
-                            {% else %}
-                                <span class="text-muted text-opacity-30">—</span>
+                                -
                             {% endif %}
                         </td>
                     </tr>
                     {% else %}
-                    <tr>
-                        <td colspan="9" class="text-center text-muted py-4">No volumes registered in collection database sheets.</td>
+                    <tr id="empty-fallback-row">
+                        <td colspan="9" class="text-center text-muted py-5">
+                            <div class="fs-2 mb-2">📥</div>
+                            <p class="mb-0 fw-medium">No records found matching this inventory classification.</p>
+                            <small class="text-muted">Check your cloud-published Google Sheet to make sure data entries exist.</small>
+                        </td>
                     </tr>
                     {% endfor %}
+                    
+                    <tr id="no-results-row" style="display: none;">
+                        <td colspan="9" class="text-center text-muted py-5">
+                            <div class="fs-2 mb-2">🔍</div>
+                            <p class="mb-0 fw-medium">No inventory records match your active filtering queries.</p>
+                            <small class="text-muted">Try clearing out character strings or changing the availability state modifier drop menu.</small>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -98,39 +113,55 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const searchInput = document.getElementById('catalogSearch');
-    const statusFilter = document.getElementById('statusFilter');
-    const tableRows = document.querySelectorAll('#catalogTable tbody .book-row');
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('catalog-search-input');
+    const statusFilter = document.getElementById('status-filter-select');
+    const bookRows = document.querySelectorAll('.book-row');
+    const noResultsRow = document.getElementById('no-results-row');
+    const displayedCountElement = document.getElementById('displayed-count');
 
-    function filterCatalogTable() {
-        const searchQuery = searchInput.value.toLowerCase().trim();
-        const selectedStatus = statusFilter.value.toLowerCase().trim();
+    function executeClientFiltering() {
+        const queryText = searchInput.value.toLowerCase().trim();
+        const targetedStatus = statusFilter.value;
+        let visibleItemsCounter = 0;
 
-        tableRows.forEach(row => {
-            const titleText = row.querySelector('.search-title') ? row.querySelector('.search-title').textContent.toLowerCase() : '';
-            const authorText = row.querySelector('.search-author') ? row.querySelector('.search-author').textContent.toLowerCase() : '';
-            const idText = row.querySelector('.search-id') ? row.querySelector('.search-id').textContent.toLowerCase() : '';
-            const categoryText = row.querySelector('.search-category') ? row.querySelector('.search-category').textContent.toLowerCase() : '';
-            const rowStatusValue = row.querySelector('.search-status') ? row.querySelector('.search-status').getAttribute('data-status').toLowerCase().trim() : '';
+        bookRows.forEach(row => {
+            // Extract attributes and plain text content fields safely
+            const rowStatus = row.getAttribute('data-status');
+            
+            let searchableAggregateText = '';
+            const internalTextNodes = row.querySelectorAll('.target-text');
+            internalTextNodes.forEach(node => {
+                searchableAggregateText += ' ' + node.textContent.toLowerCase();
+            });
 
-            const matchesSearch = titleText.includes(searchQuery) || 
-                                  authorText.includes(searchQuery) || 
-                                  idText.includes(searchQuery) ||
-                                  categoryText.includes(searchQuery);
-                                  
-            const matchesStatus = selectedStatus === "" || rowStatusValue === selectedStatus;
+            // Match structural status filter evaluations
+            const matchStatus = (targetedStatus === 'all') || (rowStatus === targetedStatus);
+            // Match textual query entries strings metrics
+            const matchText = (queryText === '') || searchableAggregateText.includes(queryText);
 
-            if (matchesSearch && matchesStatus) {
-                row.style.setProperty('display', '', 'important');
+            if (matchStatus && matchText) {
+                row.style.display = '';
+                visibleItemsCounter++;
             } else {
-                row.style.setProperty('display', 'none', 'important');
+                row.style.display = 'none';
             }
         });
+
+        // Track and adjust total metrics dynamically in real-time
+        displayedCountElement.textContent = visibleItemsCounter;
+
+        // Toggle visibility helper warning alerts if matching index array is empty
+        if (visibleItemsCounter === 0 && bookRows.length > 0) {
+            noResultsRow.style.display = '';
+        } else {
+            noResultsRow.style.display = 'none';
+        }
     }
 
-    searchInput.addEventListener('input', filterCatalogTable);
-    statusFilter.addEventListener('change', filterCatalogTable);
+    // Bind execution channels on interface keystroke changes
+    searchInput.addEventListener('input', executeClientFiltering);
+    statusFilter.addEventListener('change', executeClientFiltering);
 });
 </script>
 {% endblock %}
