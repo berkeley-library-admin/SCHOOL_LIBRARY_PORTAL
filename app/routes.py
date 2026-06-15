@@ -5,18 +5,23 @@ main_bp = Blueprint('main', __name__)
 
 @main_bp.route('/')
 def index():
-    """Renders the central library overview management panel layout metrics dashboard."""
+    """Renders the central library overview management panel layout metrics dashboard with all required context."""
     all_books = get_live_books_data()
     
+    # Calculate live global operational data stats metrics counters
     total_stock = len(all_books)
     borrowed_count = sum(1 for b in all_books if str(b.get('status', '')).strip().lower() != 'available' and str(b.get('status', '')).strip() != '')
     available_count = total_stock - borrowed_count
     
-    # FIX: Change 'index.html' to 'dashboard.html' if that is what your file is named!
-    return render_template('dashboard.html', 
-                           total_stock=total_stock, 
-                           borrowed_count=borrowed_count, 
-                           available_count=available_count)
+    # Pack variables into the exact dictionary object framework dashboard.html expects
+    stats_payload = {
+        'total': total_stock,
+        'borrowed': borrowed_count,
+        'available': available_count
+    }
+    
+    # Pass BOTH stats and books variables safely over to satisfy the template loops
+    return render_template('dashboard.html', stats=stats_payload, books=all_books)
 
 @main_bp.route('/reference')
 def reference_catalog():
