@@ -8,12 +8,12 @@ def index():
     """Renders the central library overview management panel layout metrics dashboard."""
     all_books = get_live_books_data()
     
-    # Calculate live global operational data stats metrics counters
     total_stock = len(all_books)
     borrowed_count = sum(1 for b in all_books if str(b.get('status', '')).strip().lower() != 'available' and str(b.get('status', '')).strip() != '')
     available_count = total_stock - borrowed_count
     
-    return render_template('index.html', 
+    # FIX: Change 'index.html' to 'dashboard.html' if that is what your file is named!
+    return render_template('dashboard.html', 
                            total_stock=total_stock, 
                            borrowed_count=borrowed_count, 
                            available_count=available_count)
