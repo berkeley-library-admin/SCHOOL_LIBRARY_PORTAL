@@ -1,38 +1,60 @@
-from flask import Blueprint, render_template, jsonify
-from app.services.sheets_service import get_live_books_data
+from flask import Blueprint, render_template, current_app
+from app.services.sheets_service import get_reference_data, get_scholastic_data, get_live_books_data
 
 main_bp = Blueprint('main', __name__)
 
 @main_bp.route('/')
-def dashboard():
-    # 1. Fetch live books from our Google Sheet service wrapper
-    books = get_live_books_data()
-    
-    # 2. Compute live library statistics programmatically
-    total_books = len(books)
-    available_books = sum(1 for b in books if b.get('status', '').strip().lower() == 'available')
-    borrowed_books = sum(1 for b in books if b.get('status', '').strip().lower() == 'borrowed')
-    
-    # 3. Compile statistics metrics dictionary object
-    stats = {
-        'total': total_books,
-        'available': available_books,
-        'borrowed': borrowed_books
-    }
-    
-    # 4. Pass down data and calculations to our landing template dashboard
-    return render_template('dashboard.html', books=books, stats=stats)
-
-@main_bp.route('/catalog')
-def catalog():
-    # Pull fresh data from our Google Sheet link wrapper
-    books = get_live_books_data()
-    return render_template('catalog.html', books=books)
-    
-@main_bp.route('/borrowed')
-def borrowed_panel():
-    # Fetch fresh spreadsheet streams
+def index():
+    """Renders the central library overview management panel layout metrics dashboard."""
     all_books = get_live_books_data()
-    # Filter the array in Python to isolate ONLY borrowed logs
-    active_loans = [b for b in all_books if b.get('status', '').strip().lower() == 'borrowed']
-    return render_template('borrowed.html', loans=active_loans)
+    
+    # Calculate live global operational data stats metrics counters
+    total_stock = len(all_books)
+    borrowed_count = sum(1 for b in all_books if str(b.get('status', '')).strip().lower() != 'available' and str(b.get('status', '')).strip() != '')
+    available_count = total_stock - borrowed_count
+    
+    return render_template('index.html', 
+                           total_stock=total_stock, 
+                           borrowed_count=borrowed_count, 
+                           available_count=available_count)
+
+@main_bp.route('/reference')
+def reference_catalog():
+    """Renders the real-time grid overview framework ledger tracker for the Reference Collection."""
+    books = get_reference_data()
+    return render_template('catalog.html', 
+                           books=books, 
+                           collection_title="Reference Collection")
+
+@main_bp.route('/scholastic')
+def scholastic_catalog():
+    """Renders the real-time grid overview framework ledger tracker for the Scholastic Collection."""
+    books = get_scholastic_data()
+    return render_template('catalog.html', 
+                           books=books, 
+                           collection_title="Scholastic Collection")
+
+@main_bp.route('/borrowed')
+def borrowed():
+    """Scans both Reference and Scholastic cloud data arrays to isolate active outstanding asset loans."""
+    reference_books = get_reference_data()
+    scholastic_books = get_scholastic_data()
+    
+    borrowed_list = []
+    
+    # 1. Parse operational metrics across the Reference spreadsheet feed entries
+    for book in reference_books:
+        status_clean = str(book.get('status', '')).strip().lower()
+        if status_clean != 'available' and status_clean != '':
+            book['collection_source'] = 'Reference Collection'
+            borrowed_list.append(book)
+            
+    # 2. Parse operational metrics across the Scholastic spreadsheet feed entries
+    for book in scholastic_books:
+        status_clean = str(book.get('status', '')).strip().lower()
+        if status_clean != 'available' and status_clean != '':
+            book['collection_source'] = 'Scholastic Collection'
+            borrowed_list.append(book)
+            
+    # 3. Stream the unified real-time active transaction array payload out to display
+    return render_template('borrowed.html', borrowed_books=borrowed_list)
