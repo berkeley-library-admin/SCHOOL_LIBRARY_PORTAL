@@ -34,8 +34,11 @@
                     
                     <tr>
                         <td class="ps-4 fw-semibold text-primary fs-7">{{ book.get('lexile_level', book.get('call_number', 'N/A')) }}</td>
+                        
                         <td><strong class="text-dark d-block">{{ book.get('title', 'Untitled') }}</strong></td>
+                        
                         <td class="text-secondary">{{ book.get('author', 'Unknown') }}</td>
+                        
                         <td><span class="text-muted fs-7">{{ book.get('category', 'General') }}</span></td>
                         
                         <td class="text-center">
@@ -80,7 +83,7 @@
 </div>
 
 <script>
-    // Live instantaneous input searching filter engine
+    // Live continuous sorting input filter routine engine
     document.getElementById('catalogSearch').addEventListener('keyup', function() {
         let filter = this.value.toLowerCase();
         let rows = document.querySelectorAll('#catalogTable tbody tr');
