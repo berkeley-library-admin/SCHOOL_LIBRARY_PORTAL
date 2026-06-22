@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">📚 Physical Shelf Inventory</h2>
+            <p class="text-muted mb-0">Monitor multiple copies and check current shelf availability at a glance.</p>
+        </div>
+        <input type="text" id="shelfSearch" class="form-control w-25 shadow-sm" placeholder="🔍 Search titles or call numbers...">
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="shelfTable">
+                <thead class="table-light text-secondary text-uppercase fs-7 fw-bold">
+                    <tr>
+                        <th class="ps-4">Call Number</th>
+                        <th>Book Title</th>
+                        <th>Author</th>
+                        <th class="text-center">Total Owned</th>
+                        <th class="text-center">On Loan</th>
+                        <th class="pe-4 text-center">Available on Shelf</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in inventory %}
+                    <tr>
+                        <td class="ps-4 fw-semibold text-primary fs-7">{{ item.call_number }}</td>
+                        <td><strong class="text-dark">{{ item.title }}</strong></td>
+                        <td class="text-secondary">{{ item.author }}</td>
+                        <td class="text-center"><span class="badge bg-secondary rounded-pill">{{ item.total_owned }}</span></td>
+                        <td class="text-center">
+                            <span class="badge {% if item.borrowed > 0 %}bg-warning text-dark{% else %}bg-light text-muted{% endif %} rounded-pill">
+                                {{ item.borrowed }}
+                            </span>
+                        </td>
+                        <td class="pe-4 text-center">
+                            <span class="badge {% if item.on_shelf > 0 %}bg-success{% else %}bg-danger{% endif %} px-3 py-2 rounded-pill fw-bold">
+                                {{ item.on_shelf }} left on shelf
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Quick live filter search bar feature
+    document.getElementById('shelfSearch').addEventListener('keyup', function() {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll('#shelfTable tbody tr');
+        rows.forEach(row => {
+            let text = row.innerText.toLowerCase();
+            row.style.display = text.includes(filter) ? '' : 'none';
+        });
+    });
+</script>
+{% endblock %}
