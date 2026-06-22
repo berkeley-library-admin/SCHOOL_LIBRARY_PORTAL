@@ -63,3 +63,44 @@ def borrowed():
             
     # 3. Stream the unified real-time active transaction array payload out to display
     return render_template('borrowed.html', borrowed_books=borrowed_list)
+    @main_bp.route('/shelves')
+def shelf_monitor():
+    """Aggregates book titles to monitor total stock versus what is physically on the shelves."""
+    all_books = get_live_books_data()
+    
+    # Dictionary to store tracking metrics for each unique title
+    inventory = {}
+    
+    for book in all_books:
+        title = book.get('title', '').strip()
+        if not title:
+            continue
+            
+        status = str(book.get('status', '')).strip().lower()
+        is_borrowed = status != 'available' and status != ''
+        
+        # If we haven't seen this book title yet, initialize its metrics
+        if title not in inventory:
+            inventory[title] = {
+                'title': title,
+                'author': book.get('author', 'Unknown'),
+                'call_number': book.get('call_number', 'N/A'),
+                'total_owned': 0,
+                'borrowed': 0
+            }
+            
+        # Accumulate copy counts
+        inventory[title]['total_owned'] += 1
+        if is_borrowed:
+            inventory[title]['borrowed'] += 1
+
+    # Calculate final on-shelf numbers for each unique book layout
+    shelf_list = []
+    for title, data in inventory.items():
+        data['on_shelf'] = data['total_owned'] - data['borrowed']
+        shelf_list.append(data)
+        
+    # Sort alphabetically by book title
+    shelf_list.sort(key=lambda x: x['title'])
+    
+    return render_template('shelves.html', inventory=shelf_list)
