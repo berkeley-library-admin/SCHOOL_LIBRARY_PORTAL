@@ -13,7 +13,7 @@
         <div class="col-md-4">
             <div class="card bg-white border-0 shadow-sm p-4 h-100 border-start border-primary border-4">
                 <div class="text-muted text-uppercase small fw-bold tracking-wider">Total Collection</div>
-                <div class="fs-1 fw-bold text-dark my-1">{{ stats.total }}</div>
+                <div class="fs-1 fw-bold text-dark my-1">{{ total_stock }}</div>
                 <div class="text-success small fw-medium">Live from Registry</div>
             </div>
         </div>
@@ -21,7 +21,7 @@
         <div class="col-md-4">
             <div class="card bg-white border-0 shadow-sm p-4 h-100 border-start border-success border-4">
                 <div class="text-muted text-uppercase small fw-bold tracking-wider">Available on Shelves</div>
-                <div class="fs-1 fw-bold text-success my-1">{{ stats.available }}</div>
+                <div class="fs-1 fw-bold text-success my-1">{{ available_count }}</div>
                 <div class="text-muted small">Ready for checkout</div>
             </div>
         </div>
@@ -29,7 +29,7 @@
         <div class="col-md-4">
             <div class="card bg-white border-0 shadow-sm p-4 h-100 border-start border-warning border-4">
                 <div class="text-muted text-uppercase small fw-bold tracking-wider">Currently Borrowed</div>
-                <div class="fs-1 fw-bold text-warning my-1">{{ stats.borrowed }}</div>
+                <div class="fs-1 fw-bold text-warning my-1">{{ borrowed_count }}</div>
                 <div class="text-muted small">Due date tracking active</div>
             </div>
         </div>
