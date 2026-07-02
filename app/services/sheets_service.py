@@ -1,11 +1,11 @@
 import urllib.request
 import csv
 import io
+from collections import Counter
 
 # 🔗 VERIFIED CLOUD BACKEND DATABASE DIRECT PIPELINES
-REFERENCE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTru3u7MU1xdpuI2NIHn3f-gPjGALM_97ipCtO_FD-vQhjwb7ZNDQG4q15toLMGbdGA5JLlKNOE-klv/pub?output=csv'
-
-SCHOLASTIC_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSnt8fXWYKBqRAg9tf2NbKc6OLmkGaC4JqAjyjJWLcCrTZ5OUeB1s3y7x_JgBmuE0cqZlMnBkL7CAyG/pub?output=csv'
+REFERENCE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTozu3PlNtmY3F-gkfJwh-KCfqJzkX3MvVkmxVw6Sll9W8D8-Yl/pub?output=csv'
+SCHOLASTIC_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTcnFdt9M9kBybIkgwTCNGmWbXwB2uClujYjWQLCcrJ2s0wHzEy_EpXBWwXcpZHdhs3jY1w/pub?output=csv'
 
 def process_and_sanitize_row(row):
     """Cleans up rows altered by Google Sheets dropdown formatting and returns exactly 9 fields."""
@@ -32,28 +32,50 @@ def fetch_sheet_by_url(url):
         csv_data = csv.reader(io.StringIO(csv_text))
         rows = list(csv_data)
         
-        if rows and len(rows) > 1:
+        if len(rows) > 1:
             for row in rows[1:]:
                 if not row or not row[0].strip():
                     continue
                 clean = process_and_sanitize_row(row)
                 books_list.append({
-                    'id': clean[0], 'title': clean[1], 'author': clean[2],
-                    'category': clean[3], 'status': clean[4], 'borrowed_by': clean[5],
-                    'level_section': clean[6], 'date_borrowed': clean[7], 'due_date': clean[8]
+                    'id': clean[0],
+                    'title': clean[1],
+                    'author': clean[2],
+                    'category': clean[3],
+                    'status': clean[4],
+                    'borrowed_by': clean[5],
+                    'level_section': clean[6],
+                    'date_borrowed': clean[7],
+                    'due_date': clean[8]
                 })
     except Exception as e:
-        print(f"[❌ API Error] Failed to fetch data from {url}: {e}")
+        print(f"[❌ API Error] Failed to fetch data from URL: {e}")
+    return books_list
+
+def calculate_copy_counts(books_list):
+    """Helper function to inject total_copies and available_copies counts dynamically into every book."""
+    # Count occurrences of each title
+    total_counts = Counter(book['title'] for book in books_list)
+    available_counts = Counter(book['title'] for book in books_list if book['status'].strip().lower() == 'available')
+    
+    # Inject values back into the dictionaries
+    for book in books_list:
+        book['total_copies'] = total_counts[book['title']]
+        book['available_copies'] = available_counts[book['title']]
     return books_list
 
 def get_reference_data():
     """Fetches real-time metrics for the Reference Collection."""
-    return fetch_sheet_by_url(REFERENCE_CSV_URL)
+    raw_books = fetch_sheet_by_url(REFERENCE_CSV_URL)
+    return calculate_copy_counts(raw_books)
 
 def get_scholastic_data():
     """Fetches real-time metrics for the Scholastic Collection."""
-    return fetch_sheet_by_url(SCHOLASTIC_CSV_URL)
+    raw_books = fetch_sheet_by_url(SCHOLASTIC_CSV_URL)
+    return calculate_copy_counts(raw_books)
 
 def get_live_books_data():
     """Combines both collections for the main dashboard global tracking overview."""
-    return get_reference_data() + get_scholastic_data()
+    combined_books = get_reference_data() + get_scholastic_data()
+    # Recalculate combined totals across both groups if identical books exist in both
+    return calculate_copy_counts(combined_books)
