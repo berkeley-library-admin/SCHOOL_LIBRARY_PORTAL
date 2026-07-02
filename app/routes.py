@@ -12,12 +12,14 @@ def index():
     borrowed_count = sum(1 for b in all_books if str(b.get('status', '')).strip().lower() != 'available' and str(b.get('status', '')).strip() != '')
     available_count = total_stock - borrowed_count
     
-    # Pack parameters into a stats payload to fulfill dashboard design variables
-    stats_payload = {
-        'total': total_stock,
-        'borrowed': borrowed_count,
-        'available': available_count
-    }
+    # Pass everything your dashboard.html explicitly expects!
+    return render_template(
+        'dashboard.html', 
+        total_stock=total_stock,
+        borrowed_count=borrowed_count,
+        available_count=available_count,
+        books=all_books  # This fixes the slicing crash!
+    )
     
     return render_template('dashboard.html', stats=stats_payload)
 
