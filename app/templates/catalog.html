@@ -29,9 +29,9 @@
                 </thead>
                 <tbody>
                     {% for book in books %}
-                        {# Calculate totals safely based on matching titles #}
-                        {% set total_copies = books | selectattr('Title', 'equalto', book.get('Title', book.get('title', ''))) | list | length %}
-                        {% set available_copies = books | selectattr('Title', 'equalto', book.get('Title', book.get('title', ''))) | selectattr('Status', 'equalto', 'Available') | list | length %}
+    {# Read the values calculated directly by Python instead of trying to filter loops in HTML #}
+    {% set total_copies = book.total_copies %}
+    {% set available_copies = book.available_copies %}
                         
                         <tr>
                             <td class="ps-4 fw-semibold text-primary fs-7">
