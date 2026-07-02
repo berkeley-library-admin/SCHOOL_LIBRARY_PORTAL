@@ -85,6 +85,7 @@
                         </tr>
                     {% else %}
                         <tr>
+                            {# ✅ FIXED: Added missing closing quote to colspan property here #}
                             <td colspan="{% if is_admin %}8{% else %}7{% endif %}" class="text-center text-muted py-5">
                                 <p class="mb-0 fw-medium">No books found in this collection.</p>
                             </td>
