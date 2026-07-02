@@ -1,11 +1,12 @@
 import urllib.request
 import csv
 import io
+import time
 from collections import Counter
 
-# 🔗 VERIFIED CLOUD BACKEND DATABASE DIRECT PIPELINES
-REFERENCE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTru3u7MU1xdpuI2NIHn3f-gPjGALM_97ipCtO_FD-vQhjwb7ZNDQG4q15toLMGbdGA5JLlKNOE-klv/pub?output=csv'
-SCHOLASTIC_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSnt8fXWYKBqRAg9tf2NbKc6OLmkGaC4JqAjyjJWLcCrTZ5OUeB1s3y7x_JgBmuE0cqZlMnBkL7CAyG/pub?output=csv'
+# 🔗 CLOUD BACKEND DATA PATH PIPELINES
+REFERENCE_BASE_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTozu3PlNtmY3F-gkfJwh-KCfqJzkX3MvVkmxVw6Sll9W8D8-Yl/pub?output=csv'
+SCHOLASTIC_BASE_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTcnFdt9M9kBybIkgwTCNGmWbXwB2uClujYjWQLCcrJ2s0wHzEy_EpXBWwXcpZHdhs3jY1w/pub?output=csv'
 
 def process_and_sanitize_row(row):
     """Cleans up rows altered by Google Sheets dropdown formatting and returns exactly 9 fields."""
@@ -23,11 +24,17 @@ def process_and_sanitize_row(row):
         str(row[8]).strip()   # Due Date
     ]
 
-def fetch_sheet_by_url(url):
-    """Generic engine helper to safely parse a spreadsheet feed by its specific URL."""
+def fetch_sheet_by_url(base_url):
+    """Generic engine helper that appends a dynamic cache-buster timestamp to force real-time cloud data retrieval."""
     books_list = []
     try:
-        response = urllib.request.urlopen(url, timeout=5)
+        # ⚡ CACHE-BUSTER REVOLUTION
+        # Appending a fresh timestamp forces Google to parse the sheet row changes faster
+        bust_time = int(time.time())
+        live_timestamp_url = f"{base_url}&t={bust_time}"
+        
+        # Open network pipeline with a 5-second timeout safeguard
+        response = urllib.request.urlopen(live_timestamp_url, timeout=5)
         csv_text = response.read().decode('utf-8')
         csv_data = csv.reader(io.StringIO(csv_text))
         rows = list(csv_data)
@@ -49,33 +56,30 @@ def fetch_sheet_by_url(url):
                     'due_date': clean[8]
                 })
     except Exception as e:
-        print(f"[❌ API Error] Failed to fetch data from URL: {e}")
+        print(f"[❌ API Error] Failed to fetch data in real-time: {e}")
     return books_list
 
 def calculate_copy_counts(books_list):
     """Helper function to inject total_copies and available_copies counts dynamically into every book."""
-    # Count occurrences of each title
     total_counts = Counter(book['title'] for book in books_list)
     available_counts = Counter(book['title'] for book in books_list if book['status'].strip().lower() == 'available')
     
-    # Inject values back into the dictionaries
     for book in books_list:
         book['total_copies'] = total_counts[book['title']]
         book['available_copies'] = available_counts[book['title']]
     return books_list
 
 def get_reference_data():
-    """Fetches real-time metrics for the Reference Collection."""
-    raw_books = fetch_sheet_by_url(REFERENCE_CSV_URL)
+    """Fetches real-time cache-busted metrics for the Reference Collection."""
+    raw_books = fetch_sheet_by_url(REFERENCE_BASE_URL)
     return calculate_copy_counts(raw_books)
 
 def get_scholastic_data():
-    """Fetches real-time metrics for the Scholastic Collection."""
-    raw_books = fetch_sheet_by_url(SCHOLASTIC_CSV_URL)
+    """Fetches real-time cache-busted metrics for the Scholastic Collection."""
+    raw_books = fetch_sheet_by_url(SCHOLASTIC_BASE_URL)
     return calculate_copy_counts(raw_books)
 
 def get_live_books_data():
     """Combines both collections for the main dashboard global tracking overview."""
     combined_books = get_reference_data() + get_scholastic_data()
-    # Recalculate combined totals across both groups if identical books exist in both
     return calculate_copy_counts(combined_books)
