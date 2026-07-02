@@ -1,16 +1,15 @@
 from flask import Flask
+from app.routes import main_bp
 
 def create_app():
-    # Initialize the core Flask framework application object
+    """Application factory engine responsible for initializing services, secret configurations, and routing maps."""
     app = Flask(__name__)
-app.secret_key = 'super-secret-library-token-key-change-this-later' # 👈 ADD THIS LINE
-app.register_blueprint(main_bp)
     
-    # Secret key for security sessions
-    app.config['SECRET_KEY'] = 'dev-school-library-key-12345'
-
-    # Register our website routing files (where URLs are defined)
-    from .routes import main_bp
+    # 🔒 STEP 2: SECURE APPLICATION SECRET KEY FOR COOKIE SIGNING
+    # This prevents users from altering their session status manually.
+    app.secret_key = 'super-secret-library-token-key-change-this-later'
+    
+    # Register your blueprints
     app.register_blueprint(main_bp)
-
+    
     return app
