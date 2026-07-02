@@ -30,7 +30,7 @@
                 <tbody>
                     {% for book in books %}
                     {% set total_copies = books | selectattr('title', 'equalto', book.title) | list | length %}
-                    {% set available_copies = books | selectattr('title', 'equalto', book.title) | selectattr('status', 'ignorecase', 'equalto', 'available') | list | length %}
+                    {% set available_copies = books | selectattr('title', 'equalto', book.title) | selectattr('status', 'equalto', 'available') | list | length %}
                     
                     <tr>
                         <td class="ps-4 fw-semibold text-primary fs-7">{{ book.get('lexile_level', book.get('call_number', 'N/A')) }}</td>
