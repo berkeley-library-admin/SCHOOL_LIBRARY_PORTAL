@@ -5,8 +5,8 @@ import time
 from collections import Counter
 
 # 🔗 CLOUD BACKEND DATA PATH PIPELINES
-REFERENCE_BASE_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTozu3PlNtmY3F-gkfJwh-KCfqJzkX3MvVkmxVw6Sll9W8D8-Yl/pub?output=csv'
-SCHOLASTIC_BASE_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTcnFdt9M9kBybIkgwTCNGmWbXwB2uClujYjWQLCcrJ2s0wHzEy_EpXBWwXcpZHdhs3jY1w/pub?output=csv'
+REFERENCE_BASE_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTru3u7MU1xdpuI2NIHn3f-gPjGALM_97ipCtO_FD-vQhjwb7ZNDQG4q15toLMGbdGA5JLlKNOE-klv/pubhtml'
+SCHOLASTIC_BASE_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSnt8fXWYKBqRAg9tf2NbKc6OLmkGaC4JqAjyjJWLcCrTZ5OUeB1s3y7x_JgBmuE0cqZlMnBkL7CAyG/pubhtml'
 
 def process_and_sanitize_row(row):
     """Cleans up rows altered by Google Sheets dropdown formatting and returns exactly 9 fields."""
