@@ -23,58 +23,67 @@
                         <th>Category</th>
                         <th class="text-center">Total Copies</th>
                         <th class="text-center">Available on Shelf</th>
-                        <th>Status</th>
+                        <th class="text-center">Status</th>
                         <th class="pe-4 text-end">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for book in books %}
-                    {% set total_copies = books | selectattr('title', 'equalto', book.title) | list | length %}
-                    {% set available_copies = books | selectattr('title', 'equalto', book.title) | selectattr('status', 'equalto', 'available') | list | length %}
-                    
-                    <tr>
-                        <td class="ps-4 fw-semibold text-primary fs-7">{{ book.get('lexile_level', book.get('call_number', 'N/A')) }}</td>
+                        {# Calculate totals safely based on matching titles #}
+                        {% set total_copies = books | selectattr('Title', 'equalto', book.get('Title', book.get('title', ''))) | list | length %}
+                        {% set available_copies = books | selectattr('Title', 'equalto', book.get('Title', book.get('title', ''))) | selectattr('Status', 'equalto', 'Available') | list | length %}
                         
-                        <td><strong class="text-dark d-block">{{ book.get('title', 'Untitled') }}</strong></td>
-                        
-                        <td class="text-secondary">{{ book.get('author', 'Unknown') }}</td>
-                        
-                        <td><span class="text-muted fs-7">{{ book.get('category', 'General') }}</span></td>
-                        
-                        <td class="text-center">
-                            <span class="badge bg-light text-dark border rounded-pill px-3 py-1.5 fw-medium">
-                                {{ total_copies }} {% if total_copies > 1 %}copies{% else %}copy{% endif %}
-                            </span>
-                        </td>
-                        
-                        <td class="text-center">
-                            {% if available_copies > 0 %}
-                                <span class="badge bg-success-subtle text-success px-3 py-1.5 rounded-pill fw-bold fs-7">
-                                    🟢 {{ available_copies }} available
+                        <tr>
+                            <td class="ps-4 fw-semibold text-primary fs-7">
+                                {{ book.get('Lexile_Level', book.get('lexile_level', book.get('Call_Number', book.get('call_number', 'N/A')))) }}
+                            </td>
+                            <td>
+                                <strong class="text-dark d-block">{{ book.get('Title', book.get('title', 'Untitled')) }}</strong>
+                            </td>
+                            <td>
+                                <span class="text-secondary">{{ book.get('Author', book.get('author', 'Unknown')) }}</span>
+                            </td>
+                            <td>
+                                <span class="text-muted fs-7">{{ book.get('Category', book.get('category', 'General')) }}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-light text-dark border rounded-pill px-3 py-1.5 fw-medium">
+                                    {{ total_copies }} {{ 'copies' if total_copies > 1 else 'copy' }}
                                 </span>
-                            {% else %}
-                                <span class="badge bg-danger-subtle text-danger px-3 py-1.5 rounded-pill fw-bold fs-7">
-                                    🔴 Out of Stock
-                                </span>
-                            {% endif %}
-                        </td>
-                        
-                        <td>
-                            {% if book.get('status', '').strip().lower() == 'available' %}
-                                <span class="badge bg-success rounded-pill px-3 py-1.5 fs-7">Available</span>
-                            {% else %}
-                                <span class="badge bg-warning text-dark rounded-pill px-3 py-1.5 fs-7">Borrowed</span>
-                            {% endif %}
-                        </td>
-                        
-                        <td class="pe-4 text-end">
-                            {% if collection_title == 'Reference Collection' %}
-                                <a href="https://docs.google.com/spreadsheets/d/1_9vG86_vS3_T-6-WkC5mG_82qK3w-lPrcU9pGv9z0Yk/edit" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3">Update</a>
-                            {% else %}
-                                <a href="https://docs.google.com/spreadsheets/d/1pCszB0rZidw8w4bXb7pY2L8N9wG9g8FrcvX8G3qH8Ik/edit" target="_blank" class="btn btn-outline-success btn-sm rounded-pill px-3">Update</a>
-                            {% endif %}
-                        </td>
-                    </tr>
+                            </td>
+                            <td class="text-center">
+                                {% if available_copies > 0 %}
+                                    <span class="badge bg-success-subtle text-success px-3 py-1.5 rounded-pill fw-bold fs-7">
+                                        🟢 {{ available_copies }} Available
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger-subtle text-danger px-3 py-1.5 rounded-pill fw-bold fs-7">
+                                        🔴 Out of Stock
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if book.get('Status', book.get('status', '')).strip().lower() == 'available' %}
+                                    <span class="badge bg-success rounded-pill px-3 py-1.5 fs-7">Available</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark rounded-pill px-3 py-1.5 fs-7">Borrowed</span>
+                                {% endif %}
+                            </td>
+                            <td class="pe-4 text-end">
+                                {% if collection_title == 'Reference Collection' %}
+                                    <a href="https://docs.google.com/spreadsheets/d/1XHCJP_EMWqy8LNCHIZzMZ9UB36Ar_b1e227szNtVdtM/edit" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3">Update</a>
+                                {% else %}
+                                    <a href="https://docs.google.com/spreadsheets/d/1gCurG0iOtuGubGbHyr2L07wUo2gMFvrccXA36p303o/edit" target="_blank" class="btn btn-outline-success btn-sm rounded-pill px-3">Update</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-5">
+                                <i class="bi bi-folder-x fs-2 mb-2"></i>
+                                <p class="mb-0 fw-medium">No books found in this collection.</p>
+                            </td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -87,6 +96,7 @@
     document.getElementById('catalogSearch').addEventListener('keyup', function() {
         let filter = this.value.toLowerCase();
         let rows = document.querySelectorAll('#catalogTable tbody tr');
+        
         rows.forEach(row => {
             let text = row.innerText.toLowerCase();
             row.style.display = text.includes(filter) ? '' : 'none';
