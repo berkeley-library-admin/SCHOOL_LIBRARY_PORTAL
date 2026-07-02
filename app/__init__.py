@@ -3,6 +3,8 @@ from flask import Flask
 def create_app():
     # Initialize the core Flask framework application object
     app = Flask(__name__)
+app.secret_key = 'super-secret-library-token-key-change-this-later' # 👈 ADD THIS LINE
+app.register_blueprint(main_bp)
     
     # Secret key for security sessions
     app.config['SECRET_KEY'] = 'dev-school-library-key-12345'
