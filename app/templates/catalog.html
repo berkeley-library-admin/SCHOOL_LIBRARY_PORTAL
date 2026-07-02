@@ -24,27 +24,28 @@
                         <th class="text-center">Total Copies</th>
                         <th class="text-center">Available on Shelf</th>
                         <th class="text-center">Status</th>
-                        <th class="pe-4 text-end">Actions</th>
+                        {% if is_admin %}
+                            <th class="pe-4 text-end">Actions</th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
                     {% for book in books %}
-    {# Read the values calculated directly by Python instead of trying to filter loops in HTML #}
-    {% set total_copies = book.total_copies %}
-    {% set available_copies = book.available_copies %}
+                        {% set total_copies = book.total_copies %}
+                        {% set available_copies = book.available_copies %}
                         
                         <tr>
                             <td class="ps-4 fw-semibold text-primary fs-7">
-                                {{ book.get('Lexile_Level', book.get('lexile_level', book.get('Call_Number', book.get('call_number', 'N/A')))) }}
+                                {{ book.id }}
                             </td>
                             <td>
-                                <strong class="text-dark d-block">{{ book.get('Title', book.get('title', 'Untitled')) }}</strong>
+                                <strong class="text-dark d-block">{{ book.title }}</strong>
                             </td>
                             <td>
-                                <span class="text-secondary">{{ book.get('Author', book.get('author', 'Unknown')) }}</span>
+                                <span class="text-secondary">{{ book.author }}</span>
                             </td>
                             <td>
-                                <span class="text-muted fs-7">{{ book.get('Category', book.get('category', 'General')) }}</span>
+                                <span class="text-muted fs-7">{{ book.category }}</span>
                             </td>
                             <td class="text-center">
                                 <span class="badge bg-light text-dark border rounded-pill px-3 py-1.5 fw-medium">
@@ -63,24 +64,27 @@
                                 {% endif %}
                             </td>
                             <td class="text-center">
-                                {% if book.get('Status', book.get('status', '')).strip().lower() == 'available' %}
+                                {% if book.status.strip().lower() == 'available' %}
                                     <span class="badge bg-success rounded-pill px-3 py-1.5 fs-7">Available</span>
                                 {% else %}
                                     <span class="badge bg-warning text-dark rounded-pill px-3 py-1.5 fs-7">Borrowed</span>
                                 {% endif %}
                             </td>
-                            <td class="pe-4 text-end">
-    {% if collection_title == 'Reference Collection' %}
-        <a href="https://docs.google.com/spreadsheets/d/1o5MW2D-lrhzcu-F9ztpdtYV9hUf-gYjwMX_RC7QCf3o/edit" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3">Update</a>
-    {% else %}
-        <a href="https://docs.google.com/spreadsheets/d/1pY6I3-1uU4TsVNPKByK0gn96TIWdmEmwKiALC19ZjN8/edit" target="_blank" class="btn btn-outline-success btn-sm rounded-pill px-3">Update</a>
-    {% endif %}
-</td>
+                            
+                            {# 🔒 SECURE ADMIN BUTTON CHECK #}
+                            {% if is_admin %}
+                                <td class="pe-4 text-end">
+                                    {% if collection_title == 'Reference Collection' %}
+                                        <a href="https://docs.google.com/spreadsheets/d/1o5MW2D-lrhzcu-F9ztpdtYV9hUf-gYjwMX_RC7QCf3o/edit" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3">Update</a>
+                                    {% else %}
+                                        <a href="https://docs.google.com/spreadsheets/d/1pY6I3-1uU4TsVNPKByK0gn96TIWdmEmwKiALC19ZjN8/edit" target="_blank" class="btn btn-outline-success btn-sm rounded-pill px-3">Update</a>
+                                    {% endif %}
+                                </td>
+                            {% endif %}
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="8" class="text-center text-muted py-5">
-                                <i class="bi bi-folder-x fs-2 mb-2"></i>
+                            <td colspan="{% if is_admin %}8{% else %}7{% endif %}" class="text-center text-muted py-5">
                                 <p class="mb-0 fw-medium">No books found in this collection.</p>
                             </td>
                         </tr>
@@ -92,7 +96,6 @@
 </div>
 
 <script>
-    // Live continuous sorting input filter routine engine
     document.getElementById('catalogSearch').addEventListener('keyup', function() {
         let filter = this.value.toLowerCase();
         let rows = document.querySelectorAll('#catalogTable tbody tr');
