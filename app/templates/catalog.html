@@ -24,6 +24,7 @@
                         <th class="text-center">Total Copies</th>
                         <th class="text-center">Available on Shelf</th>
                         <th class="text-center">Status</th>
+                        {# 🔒 STEP 3: SECURE TABLE HEADER GATEKEEPER #}
                         {% if is_admin %}
                             <th class="pe-4 text-end">Actions</th>
                         {% endif %}
@@ -71,7 +72,7 @@
                                 {% endif %}
                             </td>
                             
-                            {# 🔒 SECURE ADMIN BUTTON CHECK #}
+                            {# 🔒 STEP 3: SECURE ACTIONS BUTTON GATEKEEPER #}
                             {% if is_admin %}
                                 <td class="pe-4 text-end">
                                     {% if collection_title == 'Reference Collection' %}
@@ -96,6 +97,7 @@
 </div>
 
 <script>
+    // Live frontend search filter
     document.getElementById('catalogSearch').addEventListener('keyup', function() {
         let filter = this.value.toLowerCase();
         let rows = document.querySelectorAll('#catalogTable tbody tr');
